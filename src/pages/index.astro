@@ -1,81 +1,139 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+// components
+import Layout from '@layouts/Layout.astro'
+import IndexIntroTitle from '@components/texts/IndexIntroTitle'
+// assets
+import IntroVideo from '@assets/videos/intro.mp4'
 ---
 
-<Layout title="Welcome to Astro.">
-	<main>
-		<h1>Welcome to <span class="text-gradient">Astro</span></h1>
-		<p class="instructions">
-			To get started, open the directory <code>src/pages</code> in your project.<br />
-			<strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
-		</p>
-		<ul role="list" class="link-card-grid">
-			<Card
-				href="https://docs.astro.build/"
-				title="Documentation"
-				body="Learn how Astro works and explore the official API docs."
+<Layout>
+	<section class="intro">
+		<div class="intro-title h2">
+			<IndexIntroTitle
+				text='Explore more possibilities<br>of Web Design .'
 			/>
-			<Card
-				href="https://astro.build/integrations/"
-				title="Integrations"
-				body="Supercharge your project with new frameworks and libraries."
-			/>
-			<Card
-				href="https://astro.build/themes/"
-				title="Themes"
-				body="Explore a galaxy of community-built starter themes."
-			/>
-			<Card
-				href="https://astro.build/chat/"
-				title="Community"
-				body="Come say hi to our amazing Discord community. ❤️"
-			/>
-		</ul>
-	</main>
+		</div>
+		<div class="intro-bg absolute-center" style="--scale-ratio: 1;">
+			<video src={IntroVideo} class="intro-video" />
+		</div>
+		<div class="intro-info">
+
+		</div>
+	</section>
 </Layout>
 
-<style>
-	main {
-		margin: auto;
-		padding: 1.5rem;
-		max-width: 60ch;
-	}
-	h1 {
-		font-size: 3rem;
-		font-weight: 800;
-		margin: 0;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.instructions {
-		line-height: 1.6;
-		margin: 1rem 0;
-		border: 1px solid rgba(var(--accent), 25%);
-		background-color: white;
-		padding: 1rem;
-		border-radius: 0.4rem;
-	}
-	.instructions code {
-		font-size: 0.875em;
-		font-weight: bold;
-		background: rgba(var(--accent), 12%);
-		color: rgb(var(--accent));
-		border-radius: 4px;
-		padding: 0.3em 0.45em;
-	}
-	.instructions strong {
-		color: rgb(var(--accent));
-	}
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 1rem;
-		padding: 0;
+<style lang="scss">
+	.intro {
+		@apply relative w-screen h-screen max-h-[67.5rem] overflow-hidden;
+
+		&-title {
+			@apply absolute z-10 top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-3xl text-center text-white font-thin opacity-[calc(1-var(--title-fadeout-progress))] blur-[calc(var(--title-fadeout-progress)*3rem)];
+		}
+
+		&-bg {
+			--before-gradient: radial-gradient(50rem circle at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent, rgba(34, 31, 31, 0.5) 70%);
+
+			@apply -z-10 w-[calc(var(--scale-ratio)*100%)] h-[calc(var(--scale-ratio)*100%)];
+			// before:absolute before:z-[1] before:top-0 before:left-0 before:block before:w-full before:h-full before:bg-[image:var(--before-gradient)];
+		}
+
+		&-video {
+			@apply w-full h-full object-cover object-center;
+		}
 	}
 </style>
+
+<style is:global lang="scss">
+	.intro-title {
+		&.is-show {
+			.char {
+				transform: translate3d(0, 0, 0);
+			}
+		}
+
+		.char {
+			transform: translate3d(0, 100%, 0);
+		}
+	}
+</style>
+
+<script>
+	import { gsap } from 'gsap';
+	import { ScrollTrigger } from 'gsap/all'
+	// store
+	import { isHeaderScrolled } from '@store/globalStore'
+	import { isIntroTitleShow } from '@store/indexStore';
+
+	gsap.registerPlugin(ScrollTrigger)
+
+	// intro 特效
+	const useIntroEffect = () => {
+		const intro = document.querySelector('section.intro')
+		if (!intro) return;
+
+		const introTitle: HTMLElement = intro.querySelector('.intro-title')
+		const introBg: HTMLElement = intro.querySelector('.intro-bg')
+		const introVideo: HTMLVideoElement = intro.querySelector('.intro-video')
+
+		const titleFadeOutPoint:number = 0.05
+		const videoPlayPoint:number = 0.1
+		const scaleStartPoint:number = 0.5
+		const headerScrolledPoint: number = 0.7
+
+		const introTitleHandler = (progress: number) => {
+			if (progress > titleFadeOutPoint) {
+				if (isIntroTitleShow.get()) isIntroTitleShow.set(false)
+			}
+			else {
+				if (!isIntroTitleShow.get()) isIntroTitleShow.set(true)
+			}
+		}
+
+		const headerHandler = (progress: number) => {
+			if (progress > headerScrolledPoint) {
+				if (!isHeaderScrolled.get()) isHeaderScrolled.set(true)
+			}
+			else {
+				if (isHeaderScrolled.get()) isHeaderScrolled.set(false)
+			}
+		}
+
+		gsap.timeline({
+			scrollTrigger: {
+				trigger: intro,
+				start: 'top top',
+				end: '+=100%',
+				pin: true,
+				// markers: true,
+				onUpdate: (e) => {
+					if (!introVideo || isNaN(introVideo.duration)) return;
+					const { progress } = e
+					const { duration } = introVideo
+					introTitleHandler(progress)
+					headerHandler(progress)
+					const currentTime = ((1 - videoPlayPoint) * progress - videoPlayPoint) * duration
+					introVideo.currentTime = currentTime
+					const scaleRatio = 1 + Math.max(progress - scaleStartPoint, 0) * 4.4
+					introBg.style.setProperty('--scale-ratio', `${scaleRatio}`)
+					// const titleProgress = Math.max(Math.min((progress - titleFadeOutPoint) / (videoPlayPoint - titleFadeOutPoint), 1), 0)
+					// introTitle.style.setProperty('--title-fadeout-progress', `${titleProgress}`)
+					// console.log('%cindex.astro line:67 titleProgress', 'color: #007acc;', titleProgress);
+				}
+			}
+		})
+
+		isIntroTitleShow.listen(val => {
+			if (val) {
+				introTitle.classList.add('is-show')
+			}
+			else {
+				introTitle.classList.remove('is-show')
+			}
+		})
+	}
+
+	// DOMContentLoaded
+	document.addEventListener('DOMContentLoaded', () => {
+		useIntroEffect()
+	})
+</script>

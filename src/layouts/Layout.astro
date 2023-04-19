@@ -1,35 +1,48 @@
 ---
-export interface Props {
-	title: string;
-}
+// SITE config
+import { SITE } from '@config'
+// global style
+import '@styles/globals.scss'
+// components
+import MetaTags from '@components/common/MetaTags.astro'
+import Header from '@components/common/Header.astro'
 
-const { title } = Astro.props;
+const {
+  lang,
+  darkMode
+} = SITE
+
+const {
+  title = '',
+  page = ''
+} = Astro.props
 ---
 
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html lang={lang}>
+  <head>
+
+    <MetaTags title={title} />
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@1,400;1,500;1,700&display=swap" />
+
+    {
+      darkMode
+      &&
+      <script async>
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        document.documentElement.classList.add(theme)
+      </script>
+    }
+
+  </head>
+  <body class:list={[page]}>
+		<Header />
+		<main>
+			<slot />
+		</main>
+  </body>
 </html>
-<style is:global>
-	:root {
-		--accent: 124, 58, 237;
-		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), #da62c4 30%, white 60%);
-	}
-	html {
-		font-family: system-ui, sans-serif;
-		background-color: #F6F6F6;
-	}
-	code {
-		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-			Bitstream Vera Sans Mono, Courier New, monospace;
-	}
-</style>

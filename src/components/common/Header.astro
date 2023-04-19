@@ -1,0 +1,71 @@
+---
+import { Icon } from 'astro-icon'
+import MenuBtn from '@components/btns/MenuBtn'
+---
+
+<header class="header">
+  <div class="header-container">
+    <a href="/" class="header-logo">
+      <Icon class="header-logo_icon" name="logo" />
+    </a>
+    <MenuBtn client:load />
+  </div>
+</header>
+
+<style lang="scss">
+  .header {
+    --header-text-color: #f3f7ff;
+
+    @apply fixed z-[var(--header-z-index)] left-0 right-0 p-3 md:p-4;
+
+    &.has-scrolled {
+      --header-text-color: #111827;
+
+      .header {
+        &-container {
+          @apply px-4 md:px-5 before:opacity-100 before:scale-100;
+        }
+      }
+    }
+
+    &-container {
+      transition: padding var(--transition) var(--transition-timing);
+
+      @apply relative flex justify-between items-center p-2 md:p-3
+      before:absolute before:-z-[1] before:top-0 before:left-0 before:w-full before:h-full before:block before:rounded-xl before:bg-[rgba(255,255,255,0.2)] before:opacity-0 before:scale-105 before:backdrop-blur-3xl;
+
+      &::before {
+        transition: opacity var(--transition) var(--transition-timing), transform var(--transition) var(--transition-timing);
+      }
+    }
+
+    &-logo {
+      @apply w-10 md:w-12;
+
+      &_icon {
+        @apply fill-[var(--header-text-color)];
+      }
+    }
+  }
+</style>
+
+<script>
+  import { isHeaderScrolled } from '@store/globalStore'
+
+  const useHeaderEffect = () => {
+    const header:HTMLElement = document.querySelector('header')
+
+    isHeaderScrolled.listen(() => {
+      if (isHeaderScrolled.get()) {
+        header.classList.add('has-scrolled')
+      }
+      else {
+        header.classList.remove('has-scrolled')
+      }
+    })
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    useHeaderEffect()
+  })
+</script>

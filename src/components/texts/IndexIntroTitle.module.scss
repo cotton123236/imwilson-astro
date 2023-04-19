@@ -1,0 +1,9 @@
+.word {
+  @apply inline-block overflow-hidden pb-1;
+}
+
+.char {
+  transition: var(--char-duration) var(--transition-timing) var(--char-delay);
+
+  @apply inline-block;
+}

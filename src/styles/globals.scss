@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root,
+  html {
+    --color-primary-orange: #fb7956;
+
+    --header-z-index: 9;
+
+    --transition-xs: 0.2s;
+    --transition-sm: 0.3s;
+    --transition: 0.5s;
+    --transition-md: 0.8s;
+    --transition-lg: 1s;
+    --transition-xl: 1.2s;
+    --transition-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  body {
+    @apply font-base;
+  }
+
+  h1,
+  .h1 {
+    @apply text-h1 md:text-h1-md lg:text-h1-lg;
+  }
+
+  h2,
+  .h2 {
+    @apply text-h2 md:text-h2-md lg:text-h2-lg;
+  }
+
+  h3,
+  .h3 {
+    @apply text-h3 md:text-h3-md lg:text-h3-lg;
+  }
+
+  h4,
+  .h4 {
+    @apply text-h4 md:text-h4-md lg:text-h4-lg;
+  }
+
+  h5,
+  .h5 {
+    @apply text-h5 md:text-h5-md lg:text-h5-lg;
+  }
+
+  h6,
+  .h6 {
+    @apply text-h6 md:text-h6-md lg:text-h6-lg;
+  }
+}
+
+@layer utilities {
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+  }
+
+  .object-fit {
+    @apply relative;
+
+    img,
+    video,
+    iframe {
+      @apply absolute top-0 left-0 w-full h-full object-cover object-center;
+    }
+
+    &.contain {
+      img,
+      video,
+      iframe {
+        @apply object-contain;
+      }
+    }
+  }
+}

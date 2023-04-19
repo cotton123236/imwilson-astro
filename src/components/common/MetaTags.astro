@@ -1,0 +1,64 @@
+---
+import { SITE } from '@config'
+
+const {
+  url,
+  lang,
+  project,
+  description,
+  ogImage,
+  touchIcon
+} = SITE
+
+const {
+  title = ''
+} = Astro.props
+
+const fullTitle = `${title && title + ' | '}${project}`
+
+const canonicalURL = new URL(Astro.url.pathname, url)
+const imagesURL = new URL('/images/', url)
+---
+
+<!-- 上線前檢測: -->
+<!-- 1. astro.config.js 的 site 改成正式站網址 -->
+<!-- 2. 刪除 meta robots 設定 -->
+<!-- 3. robots.txt 改為正式站版本 -->
+<!-- 4. og image 更換 -->
+
+<!-- 測試站防止被爬蟲搜尋 (上線後刪除此段 meta 與註解) -->
+<!-- 參考文件：https://developers.google.com/search/reference/robots_meta_tag?hl=zh-tw -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noodp" />
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0" />
+<!-- 停止自動產生電話 (tel:) 連結 -->
+<meta name="format-detection" content="telephone=no" />
+<!-- favicon (svg) -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="canonical" href={canonicalURL} />
+<!-- PWA touch icon -->
+{touchIcon && <link rel="apple-touch-icon" href={`${imagesURL}${touchIcon}`} />}
+
+<!-- title -->
+<title>{fullTitle}</title>
+
+<!-- SEO -->
+<!-- General Meta Tags -->
+<meta name="title" content={fullTitle} />
+<meta name="description" content={description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:image" content={`${imagesURL}${ogImage}`} />
+<meta property="og:description" content={description} />
+<meta property="og:locale" content={lang} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:url" content={canonicalURL} />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={`${imagesURL}${ogImage}`} />

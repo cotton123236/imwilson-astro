@@ -1,0 +1,23 @@
+.menu-btn {
+  @apply flex items-center;
+
+  &_icon {
+    @apply relative block w-12 h-12 ;
+
+    span {
+      @apply absolute left-1/2 -translate-x-1/2 -translate-y-1/2 block w-5 md:w-7 h-px bg-[var(--header-text-color)];
+
+      &:first-child {
+        @apply top-[calc(50%-0.1875rem)];
+      }
+
+      &:last-child {
+        @apply top-[calc(50%+.1875rem)];
+      }
+    }
+  }
+
+  &_text {
+    @apply text-sm ml-2 md:ml-4 text-[var(--header-text-color)];
+  }
+}
